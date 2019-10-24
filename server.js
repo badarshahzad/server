@@ -5,6 +5,7 @@ const passport = require("passport");
 
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
+const home = require("./routes/api/home");
 
 const app = express(); //initiale
 
@@ -28,6 +29,7 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 
 // Use Routes
+app.use("/", home);
 app.use("/api/users", users);
 app.use("/api/profile", profile);
 
