@@ -5,13 +5,70 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 const passport = require("passport");
+const nodemailer = require("nodemailer");
 
 // Load Input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
+const validateForgotPassword = require("../../validation/forgotPassword");
 
 // Load User model
 const User = require("../../models/Users");
+
+const sendEmail = async receiverEmail => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp3.5stardesigners.net",
+    port: 2525,
+    rejectUnauthorized: false,
+    //useAuthentication: 'yes',
+    secure: false,
+    useAuthentication: false,
+    tls: {
+      rejectUnauthorized: false
+    },
+    // // true for 465, false for other ports
+    auth: {
+      user: "info@clients3.5stardesigners.net", // generated ethereal user
+      pass: "rQMNcKnJg5" // generated ethereal password
+    }
+  });
+
+  let info = await transporter.sendMail({
+    from: "info@sudoz.com", // sender address
+    to: receiverEmail, // list of receivers
+    subject: "WELCOME TO COMMEX GLOBAL", // Subject line
+    text: "", // plain text body
+    html:
+      "<html>" +
+      "<h2>" +
+      "Commex" +
+      "</h2>" +
+      "<br>" +
+      "<body>" +
+      '<p>Thank you for registering with Sudoz Global, please log into your account using the following link: <a href="https://commexminerals.com/#/login">Login</a></p>' +
+      "</body>" +
+      "</html>" // html body
+  });
+
+  console.log("The send email informtion is: " + JSON.stringify(info));
+};
+
+/**
+ *  @route POST api/users/forgotpassword
+ *  @desc Forgotpassword
+ *  @access Public
+ */
+router.post("/forgot", (req, res) => {
+  const { errors, isValid } = validateForgotPassword(req.body);
+
+  // Check Validation
+  // isValid: it will be true when the data is available
+  if (!isValid) {
+    res.status(400).json(errors);
+  }
+
+  // Send email to the user to reset password
+});
 
 /**
  *  @route  POST api/users/regiester
@@ -22,7 +79,7 @@ router.post("/register", (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
   // Check Validation
-  // isValid: it will be true when the data is avilable
+  // isValid: it will be true when the data is available
   if (!isValid) {
     res.status(400).json(errors);
   }
@@ -32,6 +89,10 @@ router.post("/register", (req, res) => {
       errors.email = "Email already exist";
       return res.status(400).json(errors);
     } else {
+      const object = sendEmail(req.body.email);
+      // Send Email to the user
+      console.log(" The email send informtion : " + JSON.stringify(object));
+
       const avatar = gravater.url(req.body.email, {
         s: "200", //Size
         r: "pg", //Rating
@@ -39,10 +100,15 @@ router.post("/register", (req, res) => {
       });
 
       const newUser = new User({
-        name: req.body.name,
+        firstName: req.body.firstName,
         email: req.body.email,
-        avatar,
-        password: req.body.password
+        lastName: req.body.lastName,
+        titleRole: req.body.titleRole,
+        other: req.body.other,
+        institutionName: req.body.institutionName,
+        username: req.body.username,
+        password: req.body.password,
+        password2: req.body.password2
       });
 
       bcrypt.genSalt(10, (err, salt) => {

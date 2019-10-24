@@ -1,20 +1,15 @@
 const Validator = require("validator");
 const isEmpty = require("./is-empty");
 
-module.exports = function validateRegisterInput(data) {
+module.exports = function validateForgotPassword(data) {
+  console.log(
+    "Data is came into the validity forgot password : " + JSON.stringify(data)
+  );
+
   let errors = {};
 
-  data.email = !isEmpty(data.email) ? data.email : "";
   data.password = !isEmpty(data.password) ? data.password : "";
   data.password2 = !isEmpty(data.password2) ? data.password2 : "";
-
-  if (Validator.isEmpty(data.email)) {
-    errors.email = "Email field is required";
-  }
-
-  if (!Validator.isEmail(data.email)) {
-    errors.email = "Email is invalid";
-  }
 
   if (Validator.isEmpty(data.password)) {
     errors.password = "Password field is required";
@@ -31,7 +26,6 @@ module.exports = function validateRegisterInput(data) {
   if (!Validator.equals(data.password, data.password2)) {
     errors.password2 = "Passwords must match";
   }
-
   return {
     errors,
     isValid: isEmpty(errors) //when data is valid provide then in parameter null, undefine, empty string passed :)
