@@ -16,7 +16,7 @@
     "express": "^4.16.4",
     "gravatar": "^1.8.0",
     "i": "^0.3.6",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.4.1",
     "nodemailer": "^6.3.1",
     "npm": "^6.5.0",
